@@ -5,15 +5,20 @@ module WxPay
     def self.generate(params)
       key = params.delete(:key)
 
-      query = params.sort.map do |key, value|
-        "#{key}=#{value}" if value != "" && !value.nil?
+      query = params.sort.map do |k, v|
+        "#{k}=#{v}" if v.to_s != ''
       end.compact.join('&')
 
       Digest::MD5.hexdigest("#{query}&key=#{key || WxPay.key}").upcase
     end
 
-    def self.verify?(params)
+    def self.verify?(params, options = {})
       params = params.dup
+      params = params.merge(options)
+      if WxPay.sandbox_mode?
+        params = params.merge(:key => WxPay.sandbox_key)
+      end
+
       sign = params.delete('sign') || params.delete(:sign)
 
       generate(params) == sign

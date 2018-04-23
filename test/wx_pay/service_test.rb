@@ -13,8 +13,6 @@ class ServiceTest < MiniTest::Test
   end
 
   def test_invoke_refund
-
-
     response_body = <<-EOF
      <xml>
        <return_code><![CDATA[SUCCESS]]></return_code>
@@ -34,11 +32,7 @@ class ServiceTest < MiniTest::Test
      </xml>
     EOF
 
-    FakeWeb.register_uri(
-      :post,
-      %r|https://api\.mch\.weixin\.qq\.com*|,
-      body: response_body
-    )
+    stub_request(:post, 'api.mch.weixin.qq.com').to_return(body: response_body)
   end
 
   def test_accept_multiple_app_id_when_invoke
